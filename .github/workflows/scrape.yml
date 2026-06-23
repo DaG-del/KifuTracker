@@ -1,0 +1,42 @@
+name: Check Go Tournament Updates
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'  # Automatically executes every 4 hours (UTC)
+  workflow_dispatch:       # Keeps a manual "Run workflow" button active in GitHub UI
+
+jobs:
+  check-and-track:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # Crucial: Allows the runner to commit changes back to state.json
+      
+    steps:
+    - name: Checkout repository codebase
+      uses: actions/checkout@v4
+
+    - name: Set up Python Environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Python Dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Execute Tracker Script
+      run: |
+        python tracker.py
+
+    - name: Commit Updated State JSON
+      run: |
+        # Check if state.json was modified so we don't make empty ghost commits
+        if [ -n "$(git status --porcelain state.json)" ]; then
+          git config --global user.name "Go Kifu Bot"
+          git config --global user.email "kifubot@github.com"
+          git add state.json
+          git commit -m "Update: Synchronized latest tournament game IDs"
+          git push
+        else
+          echo "No changes found in state.json. Skipping commit."
+        fi
