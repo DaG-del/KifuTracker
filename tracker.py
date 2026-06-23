@@ -163,7 +163,7 @@ def main():
         # =====================================================================
         try:
             # Replace 'gg1427_go_kifu_alerts' with whatever custom name you want
-            ntfy_url = "ntfy.sh/kifu_tracker_for_go_4_go_notifications"
+            ntfy_url = "https://ntfy.sh/kifu_tracker_for_go_4_go_notifications"
             
             requests.post(
                 ntfy_url, 
